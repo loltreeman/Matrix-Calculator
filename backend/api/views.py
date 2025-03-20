@@ -1,22 +1,35 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-import numpy as np
+import json
+import numpy as np  # Make sure to install: pip install numpy
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-@api_view(['POST'])
+@csrf_exempt
 def calculate_matrix(request):
-    data = request.data
-    matrixA = np.array([list(map(float, row.split(','))) for row in data['matrixA'].split(';')])
-    matrixB = np.array([list(map(float, row.split(','))) for row in data['matrixB'].split(';')]) if 'matrixB' in data else None
-    operation = data.get('operation')
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            matrixA = data.get("matrixA")
+            matrixB = data.get("matrixB")
+            operation = data.get("operation")
 
-    if operation == 'add' and matrixB is not None:
-        result = matrixA + matrixB
-    elif operation == 'subtract' and matrixB is not None:
-        result = matrixA - matrixB
-    elif operation == 'scalar':
-        scalar = float(data['scalar'])
-        result = matrixA * scalar
-    else:
-        return Response({"error": "Invalid operation"}, status=400)
+            # Convert string input to NumPy arrays
+            matrixA = np.array([list(map(int, row.split(","))) for row in matrixA.split(";")])
+            matrixB = np.array([list(map(int, row.split(","))) for row in matrixB.split(";")])
 
-    return Response({"result": result.tolist()})
+            if operation == "add":
+                result_matrix = matrixA + matrixB
+            elif operation == "subtract":
+                result_matrix = matrixA - matrixB
+            elif operation == "scalar":
+                result_matrix = 2 * matrixA  # Example: Multiply by 2
+            else:
+                return JsonResponse({"error": "Invalid operation"}, status=400)
+
+            # Convert NumPy array to a regular list for JSON serialization
+            result_list = result_matrix.tolist()
+
+            return JsonResponse({"result": result_list}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
