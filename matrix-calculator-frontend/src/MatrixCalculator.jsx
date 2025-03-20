@@ -8,6 +8,7 @@ export default function MatrixCalculator() {
   const [matrixA, setMatrixA] = useState("2, 1, -1; 1, 3, 2; 1, -1, 2");
   const [matrixB, setMatrixB] = useState("1, 0, 2; 0, 1, -1; -1, 2, 1");
   const [operation, setOperation] = useState("add");
+  const [scalar, setScalar] = useState(2); // This is only for scalar multiplication
   const [result, setResult] = useState(null);
 
   // This is a helper method to generate an "undefined" matrix with the same dimensions as matrixA input
@@ -24,9 +25,9 @@ export default function MatrixCalculator() {
         const requestData = { matrixA, operation };
 
         if (operation === "scalar") {
-            requestData.scalar = parseFloat(scalar); // Send scalar value
+            requestData.scalar = parseFloat(scalar);  
         } else if (operation !== "scalar") {
-            requestData.matrixB = matrixB; // Send matrixB for add, subtract, and multiply
+            requestData.matrixB = matrixB; 
         }
 
         const response = await axios.post(`${API_URL}matrix/calculate/`, requestData);
@@ -94,6 +95,19 @@ export default function MatrixCalculator() {
               onChange={(e) => setMatrixB(e.target.value)}
             />
           </div>
+
+          {/* This is where the user can select the scalar operations. */}
+          {operation === "scalar" && (
+            <div className="mb-3">
+              <label className="form-label">Scalar Value</label>
+              <input
+                type="number"
+                className="form-control"
+                value={scalar}
+                onChange={(e) => setScalar(e.target.value)}
+              />
+            </div>
+          )}
 
           {/* This is where the user can select the operations. */}
           <div className="mb-3">
