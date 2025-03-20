@@ -136,12 +136,12 @@ export default function MatrixCalculator() {
         </a>
         |
         <a
-            href="https://drive.google.com/file/d/1-gVpkPuDgUrFQs2z_ML6fa_MVzsjiyqE/view?usp=sharing"  
+            href="https://x.com/trixtaos"  
             target="_blank"
             rel="noopener noreferrer"
             className="mx-2 text-decoration-none"
         >
-            Where I Learned Matrices
+            Twitter
         </a>
         </div>
         <small className="text-muted">© 2025 Trixtao </small>
