@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+const API_URL = process.env.REACT_APP_API_URL || "https://trix-matrix-calculator.up.railway.app/";
+
 export default function MatrixCalculator() {
   const [matrixA, setMatrixA] = useState("2, 1, -1; 1, 3, 2; 1, -1, 2");
   const [matrixB, setMatrixB] = useState("1, 0, 2; 0, 1, -1; -1, 2, 1");
@@ -19,7 +21,7 @@ export default function MatrixCalculator() {
 
   const handleCalculate = async () => {
     try {
-      const response = await axios.post("https://trix-matrix-calculator.vercel.app/matrix/calculate/", {
+      const response = await axios.post("${API_URL}matrix/calculate/", {
         matrixA,
         matrixB,
         operation,
