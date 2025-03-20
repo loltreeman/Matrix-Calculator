@@ -21,7 +21,13 @@ def calculate_matrix(request):
             elif operation == "subtract":
                 result = np.subtract(matrixA, matrixB).tolist()
             elif operation == "scalar":
-                scalar = float(data.get("scalar", 1))  # Default scalar is 1
+                scalar = data.get("scalar")  # Get scalar from request
+                if scalar is None:
+                    return JsonResponse({"error": "Missing scalar value"}, status=400)
+                try:
+                    scalar = float(scalar)  # Ensure scalar is a float
+                except ValueError:
+                    return JsonResponse({"error": "Invalid scalar value"}, status=400)
                 result = (np.array(matrixA) * scalar).tolist()
             elif operation == "gauss":
                 result = gaussian_elimination(matrixA)
@@ -39,7 +45,7 @@ def calculate_matrix(request):
 
 
 def parse_matrix(matrix_str):
-    """ Convert a string like '2,1,-1;1,3,2;1,-1,2' into a list of lists """
+    """ Convert a string into a list of lists """
     try:
         return [list(map(float, row.split(","))) for row in matrix_str.split(";")]
     except ValueError:
@@ -52,14 +58,15 @@ def gaussian_elimination(matrix):
     rows, cols = A.shape
 
     for i in range(min(rows, cols)):
-        max_row = np.argmax(np.abs(A[i:, i])) + i
-        A[[i, max_row]] = A[[max_row, i]]
+        max_row = i + np.argmax(np.abs(A[i:, i])) 
 
-        if A[i, i] == 0:
+        if A[max_row, i] == 0:  
             continue
 
-        A[i] /= A[i, i]
-        for j in range(i + 1, rows):
+        A[[i, max_row]] = A[[max_row, i]]  
+        A[i] /= A[i, i]  
+
+        for j in range(i + 1, rows):  
             A[j] -= A[i] * A[j, i]
 
     return A.tolist()
@@ -71,14 +78,14 @@ def gauss_jordan_elimination(matrix):
     rows, cols = A.shape
 
     for i in range(min(rows, cols)):
-        max_row = np.argmax(np.abs(A[i:, i])) + i
-        A[[i, max_row]] = A[[max_row, i]]
-
-        if A[i, i] == 0:
+        max_row = i + np.argmax(np.abs(A[i:, i]))  
+        if A[max_row, i] == 0:  
             continue
+        
+        A[[i, max_row]] = A[[max_row, i]]  
+        A[i] /= A[i, i]  
 
-        A[i] /= A[i, i]
-        for j in range(rows):
+        for j in range(rows):  
             if j != i:
                 A[j] -= A[i] * A[j, i]
 
