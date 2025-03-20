@@ -3,10 +3,19 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function MatrixCalculator() {
-  const [matrixA, setMatrixA] = useState("2,1,-1;1,3,2;1,-1,2");
-  const [matrixB, setMatrixB] = useState("1,0,2;0,1,-1;-1,2,1");
+  const [matrixA, setMatrixA] = useState("2, 1, -1; 1, 3, 2; 1, -1, 2");
+  const [matrixB, setMatrixB] = useState("1, 0, 2; 0, 1, -1; -1, 2, 1");
   const [operation, setOperation] = useState("add");
   const [result, setResult] = useState(null);
+
+  // This is a helper method to generate an "undefined" matrix with the same dimensions as matrixA input
+  const generateUndefinedMatrix = (matrixStr) => {
+    const rows = matrixStr.split(";");
+    return rows.map((row) => {
+      const cols = row.split(",");
+      return cols.map(() => "undefined");
+    });
+  };
 
   const handleCalculate = async () => {
     try {
@@ -19,6 +28,8 @@ export default function MatrixCalculator() {
       setResult(response.data.result);
     } catch (error) {
       console.error("Error calculating:", error);
+      // On error, generate a matrix with "undefined" entries based on Matrix A's dimensions.
+      setResult(generateUndefinedMatrix(matrixA));
     }
   };
 
@@ -110,7 +121,7 @@ export default function MatrixCalculator() {
         </div>
       </div>
 
-        {/* Footer */}
+        {/* The footer where I would put hyperlinks because cloutchaser ako eme */}
         <footer className="mt-4 text-center py-3 bg-light">
         <div>
         <a
