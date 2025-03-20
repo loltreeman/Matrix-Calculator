@@ -21,7 +21,7 @@ export default function MatrixCalculator() {
 
   const handleCalculate = async () => {
     try {
-      const response = await axios.post("${API_URL}matrix/calculate/", {
+      const response = await axios.post(`${API_URL}matrix/calculate/`, {
         matrixA,
         matrixB,
         operation,
