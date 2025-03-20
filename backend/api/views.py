@@ -36,11 +36,21 @@ def calculate_matrix(request):
                 except ValueError:
                     return JsonResponse({"error": "Invalid scalar value"}, status=400)
                 result_matrix = np.multiply(matrixA, scalar)
+            elif operation == "multiply":
+                matrixB = parse_matrix(data.get("matrixB"))
+                if matrixB is None:
+                    return JsonResponse({"error": "Invalid matrixB format"}, status=400)
+
+                # Check if matrixA's columns match matrixB's rows for multiplication
+                if matrixA.shape[1] != matrixB.shape[0]:
+                    return JsonResponse({"error": "Matrix dimensions do not allow multiplication"}, status=400)
+
+                result_matrix = np.matmul(matrixA, matrixB)  
             else:
                 return JsonResponse({"error": "Invalid operation"}, status=400)
 
             return JsonResponse({"result": result_matrix.tolist()}, status=200)
-
+            
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 
@@ -48,7 +58,7 @@ def calculate_matrix(request):
 
 
 def parse_matrix(matrix_str):
-    """ Convert a string like '2,1,-1;1,3,2;1,-1,2' into a NumPy array """
+    """ Convert a string into an array """
     try:
         if not matrix_str: 
             return None

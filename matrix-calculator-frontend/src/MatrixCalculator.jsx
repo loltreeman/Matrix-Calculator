@@ -21,19 +21,22 @@ export default function MatrixCalculator() {
 
   const handleCalculate = async () => {
     try {
-      const response = await axios.post(`${API_URL}matrix/calculate/`, {
-        matrixA,
-        matrixB,
-        operation,
-      });
-      console.log("Full API Response:", response.data);
-      setResult(response.data.result);
-    } catch (error) {
-      console.error("Error calculating:", error);
-      // On error, generate a matrix with "undefined" entries based on Matrix A's dimensions.
-      setResult(generateUndefinedMatrix(matrixA));
-    }
-  };
+        const requestData = { matrixA, operation };
+
+        if (operation === "scalar") {
+            requestData.scalar = parseFloat(scalar); // Send scalar value
+        } else if (operation !== "scalar") {
+            requestData.matrixB = matrixB; // Send matrixB for add, subtract, and multiply
+        }
+
+        const response = await axios.post(`${API_URL}matrix/calculate/`, requestData);
+        console.log("Full API Response:", response.data);
+        setResult(response.data.result);
+        } catch (error) {
+        console.error("Error calculating:", error);
+        setResult(generateUndefinedMatrix(matrixA));
+        }
+    };
 
   const renderMatrix = (matrix) => {
     return (
@@ -103,6 +106,7 @@ export default function MatrixCalculator() {
               <option value="add">Addition</option>
               <option value="subtract">Subtraction</option>
               <option value="scalar">Scalar Multiplication</option>
+              <option value="multiply">Matrix Multiplication</option>
               <option value="gauss">Gaussian Elimination</option>
               <option value="jordan">Gauss-Jordan Elimination</option>
             </select>
