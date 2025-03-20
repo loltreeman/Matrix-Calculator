@@ -19,7 +19,7 @@ export default function MatrixCalculator() {
 
   const handleCalculate = async () => {
     try {
-      const response = await axios.post("http://127.0.0.1:8000/matrix/calculate/", {
+      const response = await axios.post("https://trix-matrix-calculator.vercel.app/matrix/calculate/", {
         matrixA,
         matrixB,
         operation,
