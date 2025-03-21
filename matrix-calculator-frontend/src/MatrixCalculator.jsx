@@ -11,6 +11,25 @@ export default function MatrixCalculator() {
   const [scalar, setScalar] = useState(2); // This is only for scalar multiplication
   const [result, setResult] = useState(null);
 
+  const getMatrixSize = (matrixStr) => {
+    if (!matrixStr.trim()) return "0x0";
+  
+    const rows = matrixStr.split(";").map(row => row.trim()).filter(row => row !== "");
+    const numRows = rows.length;
+    
+    if (numRows === 0) return "0x0";
+  
+    const numCols = rows[0].split(",").map(col => col.trim()).filter(col => col !== "").length;
+    
+    // Check for inconsistent column count across rows
+    if (!rows.every(row => row.split(",").map(col => col.trim()).filter(col => col !== "").length === numCols)) {
+      return "Error: Inconsistent row lengths";
+    }
+  
+    return `${numRows}x${numCols}`;
+  };
+  
+
   // This is a helper method to generate an "undefined" matrix with the same dimensions as matrixA input
   const generateUndefinedMatrix = (matrixStr) => {
     const rows = matrixStr.split(";");
@@ -75,7 +94,7 @@ export default function MatrixCalculator() {
           {/* This is where the user will input Matrix A */}
           <div className="mb-3">
             <label className="form-label">
-              Matrix A (comma-separated, ; for new row)
+              Matrix A (comma-separated, ; for new row) - Size: {getMatrixSize(matrixA)}
             </label>
             <textarea
               className="form-control"
@@ -85,9 +104,12 @@ export default function MatrixCalculator() {
             />
           </div>
 
+
           {/* This is where the user will input Matrix B */}
           <div className="mb-3">
-            <label className="form-label">Matrix B (if needed)</label>
+            <label className="form-label">
+              Matrix B (if needed) - Size: {getMatrixSize(matrixB)}
+            </label>
             <textarea
               className="form-control"
               rows="3"
@@ -95,6 +117,7 @@ export default function MatrixCalculator() {
               onChange={(e) => setMatrixB(e.target.value)}
             />
           </div>
+
 
           {/* This is where the user can select the scalar operations. */}
           {operation === "scalar" && (
@@ -140,6 +163,8 @@ export default function MatrixCalculator() {
           )}
         </div>
       </div>
+
+      
 
         {/* The footer where I would put hyperlinks because cloutchaser ako eme */}
         <footer className="mt-4 text-center py-3 bg-light">
