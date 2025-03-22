@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Fraction from "fraction.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const API_URL = process.env.REACT_APP_API_URL || "https://trix-matrix-calculator.up.railway.app/";
@@ -10,6 +11,9 @@ export default function MatrixCalculator() {
   const [operation, setOperation] = useState("add");
   const [scalar, setScalar] = useState(2); // This is only for scalar multiplication
   const [result, setResult] = useState(null);
+  const [solutionStatus, setSolutionStatus] = useState("");
+  const [showFractions, setShowFractions] = useState(false);
+
 
   const getMatrixSize = (matrixStr) => {
     if (!matrixStr.trim()) return "0x0";
@@ -51,12 +55,15 @@ export default function MatrixCalculator() {
 
         const response = await axios.post(`${API_URL}matrix/calculate/`, requestData);
         console.log("Full API Response:", response.data);
+        
         setResult(response.data.result);
-        } catch (error) {
+        setSolutionStatus(response.data.solution_status); // This is to store solution status
+    } catch (error) {
         console.error("Error calculating:", error);
         setResult(generateUndefinedMatrix(matrixA));
-        }
-    };
+        setSolutionStatus("Error calculating matrix");
+    }
+};
 
   const renderMatrix = (matrix) => {
     return (
@@ -65,7 +72,11 @@ export default function MatrixCalculator() {
           {matrix.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {row.map((value, colIndex) => (
-                <td key={colIndex}>{value}</td>
+                <td key={colIndex}>
+                  {showFractions
+                    ? new Fraction(value).toFraction(true)
+                    : value}
+                </td>
               ))}
             </tr>
           ))}
@@ -73,6 +84,7 @@ export default function MatrixCalculator() {
       </table>
     );
   };
+
 
   return (
     <div
@@ -149,23 +161,44 @@ export default function MatrixCalculator() {
             </select>
           </div>
 
-          {/* This is the button to press calculate */}
+      {/* This is a checkbox to toggle fractions */}
+      <div className="form-check mb-3">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="showFractions"
+              checked={showFractions}
+              onChange={(e) => setShowFractions(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="showFractions">
+              Display results as fractions
+            </label>
+          </div>
+
           <button className="btn btn-primary w-100" onClick={handleCalculate}>
             Calculate
           </button>
 
-          {/* This is where the results section will be displayed */}
           {result && Array.isArray(result) && (
             <div className="mt-4">
               <h4 className="text-center">Result</h4>
               {renderMatrix(result)}
             </div>
           )}
+
+      {/* This is to display Solution Status */}
+      {solutionStatus && (
+            <div className="alert alert-info mt-3 text-center">
+              {solutionStatus === "unique" && "The system has a unique solution."}
+              {solutionStatus === "infinite" && "The system has infinitely many solutions."}
+              {solutionStatus === "none" && "The system has no solution."}
+              {/* Otherwise, display the raw message */}
+              {solutionStatus !== "unique" && solutionStatus !== "infinite" && solutionStatus !== "none" && solutionStatus}
+            </div>
+          )}
         </div>
       </div>
-
       
-
         {/* The footer where I would put hyperlinks because cloutchaser ako eme */}
         <footer className="mt-4 text-center py-3 bg-light">
         <div>
